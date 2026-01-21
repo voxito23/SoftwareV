@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-6 py-10">
+  <h1 class="text-2xl font-black mb-6 flex items-center gap-2">
+    <span class="material-symbols-outlined">history</span> Historial de compras
+  </h1>
+
+  {% if ordenes and ordenes|length > 0 %}
+    <div class="space-y-5">
+      {% for o in ordenes %}
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <div class="text-sm text-gray-500">Orden #{{ o.id }}</div>
+              <div class="font-black text-lg">
+                Total: ${{ "{:,.2f}".format(o.total) }}
+              </div>
+              <div class="text-sm text-gray-600">
+                Fecha: {{ o.fecha.strftime("%d/%m/%Y %H:%M") }}
+                • Tarjeta: **** {{ o.tarjeta_last4 }}
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <a href="{{ url_for('recibo_orden', orden_id=o.id) }}"
+                 class="px-4 py-3 rounded-2xl border border-gray-200 font-black text-sm hover:bg-gray-50">
+                 Descargar recibo
+              </a>
+              <a href="{{ url_for('factura_orden', orden_id=o.id) }}"
+                 class="px-4 py-3 rounded-2xl bg-black text-[#f9f506] font-black text-sm hover:opacity-95">
+                 Descargar factura
+              </a>
+            </div>
+          </div>
+
+          <div class="mt-5 border-t pt-4">
+            <div class="text-xs font-black uppercase text-gray-500 mb-3">Artículos</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {% for it in o.items %}
+                <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 border border-gray-200">
+                  <img src="{{ url_for('static', filename='images/' + (it.imagen or 'acc1.jpg')) }}"
+                       class="w-14 h-14 object-contain bg-white rounded-2xl border">
+                  <div class="flex-1">
+                    <div class="font-black text-sm line-clamp-1">{{ it.nombre }}</div>
+                    <div class="text-xs text-gray-600">
+                      x{{ it.qty }} • ${{ "{:,.2f}".format(it.precio_unit) }} c/u
+                    </div>
+                    <div class="text-[11px] text-gray-500 line-clamp-1">
+                      {{ (it.specs or "").split('|')[0] }}
+                    </div>
+                  </div>
+                  <div class="font-black text-sm">
+                    ${{ "{:,.2f}".format(it.qty * it.precio_unit) }}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="mt-5 border-t pt-4">
+            <div class="text-xs font-black uppercase text-gray-500 mb-2">Facturación usada</div>
+            <div class="text-sm text-gray-700">
+              <span class="font-black">{{ o["fact_nombre"] }}</span> • RFC: <span class="font-black">{{ o["fact_rfc"] }}</span><br>
+              {{ o["fact_calle"] }} {{ o["fact_num_ext"] }}{% if o["fact_num_int"] %} Int {{ o["fact_num_int"] }}{% endif %},
+              {{ o["fact_colonia"] }}, {{ o["fact_municipio"] }}, {{ o["fact_estado"] }},
+              CP {{ o["fact_cp"] }} • Tel {{ o["fact_telefono"] }}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-white border border-gray-200 rounded-3xl p-10 text-center">
+      <span class="material-symbols-outlined text-5xl text-gray-300">receipt_long</span>
+      <div class="font-black text-lg mt-3">Aún no tienes compras.</div>
+      <p class="text-gray-500 mt-1">Cuando hagas un pago, aparecerá aquí con opción de descargar factura y recibo.</p>
+      <a href="{{ url_for('index') }}" class="inline-block mt-5 font-black underline">Ir a la tienda</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

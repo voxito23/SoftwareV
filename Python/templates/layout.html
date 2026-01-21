@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LBVMX • Store</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=swap" rel="stylesheet"/>
+<a href="{{ url_for('historial') }}" class="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Historial">
+  <span class="material-symbols-outlined text-gray-700">history</span>
+</a>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <style>body{font-family:'Spline Sans',sans-serif;}</style>
+</head>
+
+<body class="bg-white text-gray-900 pb-24">
+
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
+  <div class="px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
+
+    <a class="flex items-center gap-3" href="{{ url_for('index') }}">
+      <div class="h-12 w-28 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm logo-box">
+        <img src="{{ url_for('static', filename='images/logo.jpg') }}"
+             alt="Logo" class="w-full h-full object-cover">
+      </div>
+      <div class="hidden sm:block">
+        <div class="font-black text-sm">LBVMX</div>
+        <div class="text-xs text-gray-500 -mt-0.5">Gift cards + Hardware</div>
+      </div>
+    </a>
+
+    <div class="flex items-center gap-2">
+      <a href="{{ url_for('carrito') }}" class="relative p-2 rounded-full hover:bg-gray-100 transition-colors" title="Carrito">
+        <span class="material-symbols-outlined text-gray-800">shopping_cart</span>
+        {% if session.get('cart') and session.get('cart')|length > 0 %}
+          <span class="absolute -top-0.5 -right-0.5 h-5 w-5 bg-black text-[#f9f506] text-[11px] font-black rounded-full flex items-center justify-center">
+            {{ session.get('cart')|length }}
+          </span>
+        {% endif %}
+      </a>
+
+      <a href="{{ url_for('index') }}" class="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Inicio">
+        <span class="material-symbols-outlined text-gray-800">home</span>
+      </a>
+
+      <button onclick="history.back()" class="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Volver">
+        <span class="material-symbols-outlined text-gray-800">arrow_back</span>
+      </button>
+
+      <a href="{{ url_for('logout') }}" class="text-xs font-black text-red-600 ml-2">Salir</a>
+    </div>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="max-w-4xl mx-auto px-6 mt-4">
+      {% for category, message in messages %}
+        <div class="p-3 rounded-xl text-sm font-black text-center border
+             {{ 'bg-green-50 text-green-700 border-green-200' if category == 'success' else 'bg-red-50 text-red-600 border-red-200' }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+</body>
+</html>

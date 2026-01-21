@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-6 py-10">
+  <h1 class="text-2xl font-black mb-6 flex items-center gap-2">
+    <span class="material-symbols-outlined">shopping_bag</span> Tu Carrito
+  </h1>
+
+  {% if cart %}
+    <div class="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm">
+      {% for item in cart %}
+        <div class="flex items-center gap-4 p-4 border-b border-gray-100 last:border-0">
+          <img src="{{ url_for('static', filename='images/' + item.imagen) }}"
+               class="w-20 h-20 object-contain bg-gray-50 rounded-2xl p-2 border border-gray-100">
+
+          <div class="flex-1">
+            <h3 class="font-black text-base">{{ item.nombre }}</h3>
+            <p class="text-xs text-gray-500 mt-1">Stock: <span class="font-black">{{ item.stock }}</span></p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <a href="{{ url_for('cart_minus', id=item.id) }}" class="w-10 h-10 grid place-items-center rounded-2xl border font-black hover:bg-gray-50">−</a>
+            <div class="w-10 text-center font-black">{{ item.qty }}</div>
+            <a href="{{ url_for('cart_plus', id=item.id) }}" class="w-10 h-10 grid place-items-center rounded-2xl border font-black hover:bg-gray-50">+</a>
+          </div>
+
+          <div class="text-right min-w-[140px]">
+            <div class="font-black text-lg">${{ "{:,.2f}".format(item.precio * item.qty) }}</div>
+            <a href="{{ url_for('cart_remove', id=item.id) }}" class="text-xs font-black text-red-600 underline">Eliminar</a>
+          </div>
+        </div>
+      {% endfor %}
+
+      <div class="p-6 bg-gray-50 flex justify-between items-center border-t border-gray-200">
+        <span class="font-black text-xl">Total a Pagar:</span>
+        <span class="font-black text-3xl">${{ "{:,.2f}".format(total) }}</span>
+      </div>
+    </div>
+
+    <div class="flex gap-4 mt-8">
+      <a href="{{ url_for('vaciar') }}" class="flex-1 py-4 text-center text-red-600 font-black text-sm border-2 border-red-100 rounded-3xl hover:bg-red-50 transition-colors">
+        Vaciar Carrito
+      </a>
+      <a href="{{ url_for('pagar') }}" class="flex-[2] py-4 text-center bg-black text-[#f9f506] font-black text-lg rounded-3xl hover:opacity-95 transition shadow-xl">
+        Proceder al Pago
+      </a>
+    </div>
+
+  {% else %}
+    <div class="text-center py-20 bg-white rounded-3xl border border-gray-200 border-dashed">
+      <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">remove_shopping_cart</span>
+      <p class="text-gray-500 font-medium">Tu carrito está vacío.</p>
+      <a href="{{ url_for('index') }}" class="text-black font-black underline mt-4 inline-block hover:text-gray-700">Volver a la tienda</a>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

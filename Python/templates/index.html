@@ -1,0 +1,147 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<main class="max-w-7xl mx-auto px-6 py-8 pb-32">
+
+  <section class="rounded-3xl overflow-hidden border border-gray-200 shadow-sm bg-white">
+    <div class="relative">
+      <div id="slides" class="flex transition-transform duration-500 ease-out">
+        <img class="slide" src="{{ url_for('static', filename='images/banners/banner1.jpg') }}" alt="Steam">
+        <img class="slide" src="{{ url_for('static', filename='images/banners/banner2.jpg') }}" alt="AliExpress">
+        <img class="slide" src="{{ url_for('static', filename='images/banners/banner3.jpg') }}" alt="Xbox">
+        <img class="slide" src="{{ url_for('static', filename='images/banners/banner4.jpg') }}" alt="Amazon">
+      </div>
+
+      <button id="prev" class="carousel-btn left-3">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <button id="next" class="carousel-btn right-3">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+        <div class="dot" data-i="0"></div>
+        <div class="dot" data-i="1"></div>
+        <div class="dot" data-i="2"></div>
+        <div class="dot" data-i="3"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="mt-8 flex flex-wrap gap-2">
+    {% for c in categorias %}
+      <a href="/?cat={{ c }}"
+         class="px-5 py-2 rounded-full text-xs font-black border transition-all
+                {{ 'bg-black text-[#f9f506] border-black' if cat == c else 'bg-white text-gray-700 hover:bg-gray-100' }}">
+        {{ c }}
+      </a>
+    {% endfor %}
+  </section>
+
+ 
+  <section class="mt-6">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-black">Tienda • {{ cat }}</h1>
+        <p class="text-sm text-gray-500">Gift cards (5%) • Consolas y hardware (7%)</p>
+      </div>
+      <div class="text-sm text-gray-500">
+        {{ productos|length }} productos
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+      {% for p in productos %}
+        <div class="card group">
+          <a href="{{ url_for('detalle', id=p.id) }}" class="block">
+            <div class="img-box">
+              <img src="{{ url_for('static', filename='images/' + p.imagen) }}" alt="{{ p.nombre }}" class="img-fit">
+              <div class="badge-top">
+                {{ "5%" if p.comision_rate == 0.05 else "7%" }}
+              </div>
+            </div>
+          </a>
+
+          <div class="p-4">
+            <a href="{{ url_for('detalle', id=p.id) }}" class="font-black text-[15px] leading-tight hover:underline">
+              {{ p.nombre }}
+            </a>
+
+            <div class="text-xs text-gray-500 mt-1 line-clamp-1">{{ p.specs.split('|')[0] }}</div>
+
+            <div class="mt-3 flex items-end justify-between gap-3">
+              <div>
+                <div class="text-xs text-gray-500">Precio</div>
+                <div class="text-xl font-black">${{ "{:,.2f}".format(p.precio_final) }}</div>
+                <div class="text-[11px] text-gray-500 -mt-0.5">Base: ${{ "{:,.2f}".format(p.precio_base) }}</div>
+              </div>
+
+              <div class="text-right">
+                <div class="text-xs font-black {{ 'text-red-600' if p.stock==0 else 'text-gray-600' }}">
+                  Stock: {{ p.stock }}
+                </div>
+              </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('add_cart', id=p.id) }}" class="mt-4 flex items-center gap-2">
+              <input type="number" name="qty" value="1" min="1" max="{{ p.stock }}"
+                     class="w-16 border border-gray-200 rounded-2xl px-2 py-2 text-sm font-black text-center bg-white"
+                     {{ 'disabled' if p.stock==0 }}>
+              <button type="submit"
+                      class="flex-1 bg-black text-[#f9f506] font-black py-2 rounded-2xl hover:opacity-95 transition
+                             {{ 'opacity-40 cursor-not-allowed' if p.stock==0 }}"
+                      {{ 'disabled' if p.stock==0 }}>
+                Añadir
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+ 
+  <section class="mt-12">
+    <div class="flex items-end justify-between">
+      <div>
+        <h2 class="text-2xl font-black">Accesorios</h2>
+        <p class="text-sm text-gray-500">También son parte de la tienda.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mt-6">
+      {% for a in accesorios %}
+        <a href="{{ url_for('detalle', id=a.id) }}" class="acc-card">
+          <img src="{{ url_for('static', filename='images/' + a.imagen) }}" class="h-20 mx-auto object-contain">
+          <div class="mt-3 font-black text-sm line-clamp-1">{{ a.nombre }}</div>
+          <div class="text-xs text-gray-500 mt-1">${{ "{:,.2f}".format(a.precio_final) }}</div>
+          <div class="text-[11px] font-black mt-2 {{ 'text-red-600' if a.stock==0 else 'text-gray-600' }}">Stock: {{ a.stock }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const slides = document.getElementById("slides");
+  const dots = document.querySelectorAll(".dot");
+  const total = 4;
+  let i = 0;
+
+  function setSlide(idx){
+    i = (idx + total) % total;
+    slides.style.transform = `translateX(-${i * 100}%)`;
+    dots.forEach((d, k) => d.classList.toggle("active", k === i));
+  }
+
+  document.getElementById("prev").addEventListener("click", () => setSlide(i - 1));
+  document.getElementById("next").addEventListener("click", () => setSlide(i + 1));
+  dots.forEach(d => d.addEventListener("click", () => setSlide(parseInt(d.dataset.i))));
+
+  setSlide(0);
+  setInterval(() => setSlide(i + 1), 5000);
+</script>
+
+{% endblock %}

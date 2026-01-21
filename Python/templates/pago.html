@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+  <div>
+    <h1 class="text-2xl font-black mb-2">Finalizar Compra</h1>
+    <p class="text-sm text-gray-500 mb-6">Fecha: <span class="font-black text-black">{{ fecha_hoy }}</span></p>
+
+    {% if guardadas and guardadas|length > 0 %}
+      <div class="bg-white border border-gray-200 rounded-3xl p-5 mb-6">
+        <p class="font-black mb-3">Tarjetas guardadas (da clic para usar)</p>
+
+        <div class="space-y-3">
+          {% for t in guardadas %}
+            <button type="button"
+                    class="w-full text-left p-4 border rounded-3xl bg-gray-50 hover:bg-white transition tarjeta-btn"
+                    data-nombre="{{ t.nombre_titular|e }}"
+                    data-rfc="{{ t.rfc|e }}"
+                    data-numero="{{ t.numero|e }}"
+                    data-exp="{{ t.fecha_expiracion|e }}">
+              <div class="flex items-center justify-between">
+                <div class="font-black">**** {{ t.numero[-4:] }}</div>
+                <div class="text-xs text-gray-600">Exp: {{ t.fecha_expiracion }}</div>
+              </div>
+              <div class="text-xs text-gray-600 mt-2">
+                Dirección asociada:
+                {{ t.bill_calle }} {{ t.bill_num_ext }}{% if t.bill_num_int %} Int {{ t.bill_num_int }}{% endif %},
+                {{ t.bill_colonia }}, {{ t.bill_municipio }}, {{ t.bill_estado }}, CP {{ t.bill_cp }} • Tel {{ t.bill_telefono }}
+              </div>
+              <div class="text-xs text-gray-600 mt-2">
+                Titular/RFC en tarjeta: <span class="font-black">{{ t.nombre_titular }}</span> • <span class="font-black">{{ t.rfc }}</span>
+              </div>
+              <div class="mt-3 text-[11px] font-black text-black/70">
+                Pagar ${{ "{:,.2f}".format(total) }}
+              </div>
+            </button>
+          {% endfor %}
+        </div>
+
+        <p class="text-xs text-gray-500 mt-3">
+         Selecciona una tarjeta guardada para pagar automáticamente.
+        </p>
+      </div>
+    {% endif %}
+
+    <form id="payForm" method="POST" class="space-y-4 bg-white border border-gray-200 rounded-3xl p-6">
+      <h2 class="font-black">Datos de la tarjeta</h2>
+
+      <div>
+        <label class="block text-xs font-black uppercase text-gray-500 mb-1">Nombre completo de la Tarjeta</label>
+        <input id="fNombre" type="text" name="nombre" required class="w-full border p-3 rounded-2xl uppercase" placeholder="NOMBRE DEL TITULAR">
+      </div>
+
+      <div>
+        <label class="block text-xs font-black uppercase text-gray-500 mb-1">RFC</label>
+        <input id="fRfc" type="text" name="rfc" minlength="13" maxlength="13" required
+               class="w-full border p-3 rounded-2xl uppercase" placeholder="RFC (13)">
+      </div>
+
+      <div>
+        <label class="block text-xs font-black uppercase text-gray-500 mb-1">Número de tarjeta de 16 dígitos</label>
+        <input id="fNumero" type="text" name="numero_tarjeta" required class="w-full border p-3 rounded-2xl" placeholder="0000 0000 0000 0000">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-black uppercase text-gray-500 mb-1">Expira (MM/YY)</label>
+          <input id="fExp" type="text" name="fecha_expiracion" required class="w-full border p-3 rounded-2xl text-center" placeholder="MM/YY">
+        </div>
+        <div>
+          <label class="block text-xs font-black uppercase text-gray-500 mb-1">CVV de 3 digitos</label>
+          <input id="fCvv" type="password" name="cvv" required class="w-full border p-3 rounded-2xl text-center" placeholder="123">
+        </div>
+      </div>
+
+      <div class="mt-2 p-4 rounded-3xl bg-gray-50 border border-gray-200">
+        <div class="flex items-start gap-3">
+          <input id="usar_dom" type="checkbox" name="usar_domicilio_tarjeta" value="1" class="mt-1">
+          <label for="usar_dom" class="text-sm">
+            <span class="font-black">Usar el domicilio guardado en la tarjeta</span>
+            <span class="text-gray-500 block text-xs"></span>
+          </label>
+        </div>
+
+        <div id="dom_box" class="mt-4 space-y-3">
+          <div class="font-black text-sm">Domicilio de facturación</div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="md:col-span-2">
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">Calle</label>
+              <input name="calle" class="w-full border p-3 rounded-2xl" placeholder="Calle">
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">No. Ext</label>
+              <input name="num_ext" class="w-full border p-3 rounded-2xl" placeholder="123">
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">No. Int</label>
+              <input name="num_int" class="w-full border p-3 rounded-2xl" placeholder="Opcional">
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">Colonia</label>
+              <input name="colonia" class="w-full border p-3 rounded-2xl" placeholder="Colonia">
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">Municipio</label>
+              <input name="municipio" class="w-full border p-3 rounded-2xl" placeholder="Municipio">
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">Estado</label>
+              <input name="estado" class="w-full border p-3 rounded-2xl" placeholder="Estado">
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">CP</label>
+              <input name="cp" class="w-full border p-3 rounded-2xl" placeholder="00000">
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">País</label>
+              <input name="pais" class="w-full border p-3 rounded-2xl" value="México">
+            </div>
+            <div>
+              <label class="block text-xs font-black uppercase text-gray-500 mb-1">Teléfono</label>
+              <input name="telefono" class="w-full border p-3 rounded-2xl" placeholder="4420000000">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm font-black text-gray-700">
+        <input type="checkbox" name="guardar_tarjeta" value="1" class="rounded">
+        Guardar esta tarjeta en mi cuenta
+      </label>
+
+      <button type="submit" class="w-full bg-black text-[#f9f506] font-black py-4 rounded-3xl hover:opacity-95">
+        PAGAR ${{ "{:,.2f}".format(total) }}
+      </button>
+    </form>
+  </div>
+
+  <div class="bg-gray-50 p-6 rounded-3xl h-fit sticky top-24 border border-gray-200">
+    <h3 class="font-black mb-4 border-b pb-2">Resumen del pedido</h3>
+
+    <div class="space-y-3 mb-4 max-h-72 overflow-y-auto pr-2">
+      {% for item in cart %}
+        <button type="button"
+                class="w-full text-left flex items-center gap-3 p-2 rounded-2xl hover:bg-white transition item-btn"
+                data-nombre="{{ item.nombre|e }}"
+                data-imagen="{{ item.imagen|e }}"
+                data-specs="{{ item.specs|e }}"
+                data-qty="{{ item.qty }}"
+                data-precio="{{ "{:,.2f}".format(item.precio) }}">
+          <img src="{{ url_for('static', filename='images/' + item.imagen) }}" class="w-12 h-12 object-contain bg-white rounded-2xl border">
+          <div class="flex-1">
+            <p class="text-xs font-black line-clamp-1">{{ item.nombre }}</p>
+            <p class="text-[11px] text-gray-500">x{{ item.qty }} • Stock: {{ item.stock }}</p>
+          </div>
+          <span class="font-black text-sm">${{ "{:,.2f}".format(item.precio * item.qty) }}</span>
+        </button>
+      {% endfor %}
+    </div>
+
+    <div class="flex justify-between font-black text-xl border-t pt-4">
+      <span>Total</span>
+      <span>${{ "{:,.2f}".format(total) }}</span>
+    </div>
+
+    <div class="mt-4 text-xs text-gray-500">
+      <p>Al hacer clic en "PAGAR", aceptas nuestros <a href="#" class="underline">Términos y condiciones</a> y la <a href="#" class="underline">Política de privacidad</a>.</p>   
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

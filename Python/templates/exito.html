@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+
+  <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+    <span class="material-symbols-outlined text-4xl text-green-600">check_circle</span>
+  </div>
+
+  <h1 class="text-3xl font-black mb-2">¡Pago Exitoso!</h1>
+  <p class="text-gray-500 mb-8 max-w-md">
+    Total pagado: <strong>${{ "{:,.2f}".format(orden.total) }}</strong> • Tarjeta: **** {{ orden.tarjeta_last4 }}
+  </p>
+
+  <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-xl max-w-lg w-full space-y-4">
+    <h3 class="font-black text-lg border-b pb-2 mb-4">Descargar documentos</h3>
+
+    <a href="{{ url_for('descargar', tipo='recibo') }}" class="flex items-center justify-between p-4 border border-gray-200 rounded-3xl hover:bg-gray-50 transition-colors group">
+      <div class="flex items-center gap-3">
+        <div class="bg-gray-100 p-2 rounded-2xl">
+          <span class="material-symbols-outlined text-gray-700">receipt</span>
+        </div>
+        <div class="text-left">
+          <p class="font-black text-sm">Recibo de compra</p>
+          <p class="text-xs text-gray-500">Comprobante simple</p>
+        </div>
+      </div>
+      <span class="material-symbols-outlined text-gray-400 group-hover:text-black">download</span>
+    </a>
+
+    <a href="{{ url_for('descargar', tipo='factura') }}" class="flex items-center justify-between p-4 border border-yellow-200 bg-yellow-50 rounded-3xl hover:bg-yellow-100 transition-colors group">
+      <div class="flex items-center gap-3">
+        <div class="bg-yellow-200 p-2 rounded-2xl">
+          <span class="material-symbols-outlined text-black">description</span>
+        </div>
+        <div class="text-left">
+          <p class="font-black text-sm text-black">Factura (demo)</p>
+          <p class="text-xs text-gray-700">Con datos fiscales capturados</p>
+        </div>
+      </div>
+      <span class="material-symbols-outlined text-gray-700 group-hover:text-black">download</span>
+    </a>
+  </div>
+
+  <a href="{{ url_for('index') }}" class="mt-8 text-sm font-black underline hover:text-gray-600">Volver a la tienda</a>
+</div>
+
+{% endblock %}

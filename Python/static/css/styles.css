@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&display=swap');
+
+.logo-box img{
+  transform: scale(1.05);
+}
+
+.slide{
+  min-width: 100%;
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+}
+
+@media (min-width: 768px){
+  .slide{ height: 340px; }
+}
+
+.carousel-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 44px;
+  width: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(0,0,0,.10);
+  box-shadow: 0 10px 30px rgba(0,0,0,.10);
+  transition: transform .15s ease, background .15s ease;
+}
+
+.carousel-btn:hover{
+  background: rgba(255,255,255,1);
+  transform: translateY(-50%) scale(1.03);
+}
+
+.dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(0,0,0,.12);
+  cursor: pointer;
+}
+
+.dot.active{
+  background: #000;
+}
+
+.card{
+  border: 1px solid rgba(0,0,0,.10);
+  border-radius: 24px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,.06);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.10);
+}
+
+.img-box{
+  position: relative;
+  background: #f8fafc;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.img-fit{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.badge-top{
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #f9f506;
+  color: #000;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  border: 1px solid rgba(0,0,0,.12);
+}
+
+.acc-card{
+  display: block;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.10);
+  border-radius: 22px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,.05);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.acc-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 35px rgba(0,0,0,.09);
+}
+
+.line-clamp-1{
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

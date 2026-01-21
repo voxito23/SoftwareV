@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<main class="max-w-7xl mx-auto px-6 py-10">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <div class="bg-white border rounded-3xl p-8 shadow-sm">
+      <div class="aspect-[4/3] flex items-center justify-center">
+        <img src="{{ url_for('static', filename='images/' + p.imagen) }}" class="max-h-full max-w-full object-contain">
+      </div>
+    </div>
+
+    <div>
+      <div class="inline-flex items-center gap-2 bg-yellow-100 border border-yellow-200 text-black px-3 py-1 rounded-full text-xs font-black">
+        Comisión: {{ "5%" if p.comision_rate == 0.05 else "7%" }}
+      </div>
+
+      <h1 class="text-4xl font-black mt-3">{{ p.nombre }}</h1>
+      <p class="text-gray-600 mt-2">{{ p.descripcion }}</p>
+
+      <div class="mt-5 flex flex-wrap items-end gap-6">
+        <div>
+          <div class="text-xs text-gray-500">Precio final</div>
+          <div class="text-4xl font-black">${{ "{:,.2f}".format(p.precio_final) }}</div>
+          <div class="text-sm text-gray-500">Base: ${{ "{:,.2f}".format(p.precio_base) }}</div>
+        </div>
+        <div class="text-sm font-black {{ 'text-red-600' if p.stock == 0 else 'text-gray-700' }}">
+          Stock disponible: {{ p.stock }}
+        </div>
+      </div>
+
+      <div class="bg-gray-50 border border-gray-200 p-6 rounded-3xl mt-6">
+        <h3 class="font-black mb-3 uppercase text-xs text-gray-500">Especificaciones</h3>
+        <ul class="space-y-2">
+          {% for s in p.specs.split('|') %}
+            <li class="flex items-start gap-2 text-sm text-gray-700">
+              <span class="material-symbols-outlined text-sm text-green-600 mt-0.5">check_circle</span>
+              <span>{{ s }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <form method="POST" action="{{ url_for('add_cart', id=p.id) }}" class="mt-6 flex items-center gap-3">
+        <input type="number" name="qty" value="1" min="1" max="{{ p.stock }}"
+               class="w-20 border border-gray-200 rounded-2xl px-3 py-3 text-sm font-black text-center bg-white"
+               {{ 'disabled' if p.stock == 0 }}>
+        <button class="flex-1 bg-black text-[#f9f506] font-black py-4 rounded-2xl hover:opacity-95 transition
+                       {{ 'opacity-40 cursor-not-allowed' if p.stock == 0 }}"
+                {{ 'disabled' if p.stock == 0 }}>
+          AÑADIR AL CARRITO
+        </button>
+      </form>
+
+      <div class="mt-10 pt-8 border-t border-gray-200">
+        <h2 class="text-xl font-black mb-4">Reseñas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% for r in reseñas %}
+            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center gap-3 mb-3">
+                <img src="{{ url_for('static', filename='images/' + r.avatar) }}" class="w-10 h-10 rounded-full object-cover border">
+                <div>
+                  <p class="font-black text-sm">{{ r.nombre }}</p>
+                  <p class="text-xs text-gray-500">{% for _ in range(r.rating) %}⭐{% endfor %}</p>
+                </div>
+              </div>
+              <p class="text-sm text-gray-700">{{ r.texto }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="mt-10 pt-8 border-t border-gray-200">
+        <h2 class="text-xl font-black mb-4">Accesorios</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {% for a in accesorios %}
+            <a href="{{ url_for('detalle', id=a.id) }}" class="acc-card">
+              <img src="{{ url_for('static', filename='images/' + a.imagen) }}" class="h-16 mx-auto object-contain">
+              <div class="mt-2 font-black text-xs line-clamp-1">{{ a.nombre }}</div>
+              <div class="text-[11px] text-gray-500">${{ "{:,.2f}".format(a.precio_final) }}</div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+{% endblock %}
+
